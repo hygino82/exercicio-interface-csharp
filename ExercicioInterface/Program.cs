@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Collections.Generic;
 using ExercicioInterface.Entities;
+using ExercicioInterface.Services;
 
 namespace ExercicioInterface
 {
@@ -11,35 +12,23 @@ namespace ExercicioInterface
         {
             Console.WriteLine("Enter contract data");
             Console.Write("Number: ");
-            int number = 8028;//int.Parse(Console.ReadLine());
+            int contractNumber = int.Parse(Console.ReadLine());
             Console.Write("Date (dd/MM/yyyy): ");
-            DateTime date = DateTime.Parse("25/06/2018");//Console.ReadLine());
+            DateTime contractDate = DateTime.ParseExact(Console.ReadLine(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
             Console.Write("Contract value: ");
-            double totalValue = 600.0;//double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-
-            Contract contract = new Contract(number, date, totalValue);
-            List<Installment> list = new List<Installment>();
-
-
+            double contractValue = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
             Console.Write("Enter number of installments: ");
-            int installments = 3;//int.Parse(Console.ReadLine());
-            double baseValue = totalValue / installments;
-            Console.WriteLine();
+            int months = int.Parse(Console.ReadLine());
 
-            for (int i = 1; i <= installments; i++)
-            {
-                double amount = baseValue * (1 + i / 100.0);
-                amount *= 1.02;
-                DateTime dueDate = date.AddMonths(i);
+            Contract myContract = new Contract(contractNumber, contractDate, contractValue);
 
-                Installment installment = new Installment(dueDate, amount);
-                list.Add(installment);
-            }
+            ContractService contractService = new ContractService(new PayPalService());
+            contractService.ProcessContract(myContract, months);
 
             Console.WriteLine("Installments:");
-            foreach (Installment p in list)
+            foreach (Installment installment in myContract.Installments)
             {
-                Console.WriteLine(p);
+                Console.WriteLine(installment);
             }
         }
     }
